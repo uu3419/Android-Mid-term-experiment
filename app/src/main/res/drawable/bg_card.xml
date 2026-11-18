@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UI 美化：列表项卡片背景（用 inset 制造卡片间距，ListView 子项 margin 不生效） -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetBottom="4dp"
+    android:insetLeft="10dp"
+    android:insetRight="10dp"
+    android:insetTop="4dp">
+
+    <shape android:shape="rectangle">
+        <solid android:color="@color/card_bg" />
+        <corners android:radius="10dp" />
+        <stroke
+            android:width="1dp"
+            android:color="@color/card_stroke" />
+    </shape>
+</inset>

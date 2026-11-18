@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UI 美化：编辑器分类下拉的圆角浅色背景 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#14000000" />
+    <corners android:radius="16dp" />
+</shape>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 导出文件通过 FileProvider 共享给其他应用 -->
+<paths>
+    <cache-path
+        name="exports"
+        path="exports/" />
+</paths>

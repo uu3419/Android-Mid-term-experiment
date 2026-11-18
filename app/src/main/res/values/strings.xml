@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NotePad</string>
+    <string name="live_folder_name">Notes</string>
+    <string name="title_edit_title">Note title:</string>
+    <string name="title_create">New note</string>
+    <string name="title_edit">%1$s</string>
+    <string name="title_view">View note</string>
+    <string name="title_notes_list">Notes</string>
+    <string name="menu_add">New note</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_open">Open</string>
+    <string name="menu_revert">Revert changes</string>
+    <string name="menu_copy">Copy</string>
+    <string name="menu_paste">Paste</string>
+    <string name="button_ok">OK</string>
+    <string name="text_title">Title:</string>
+    <string name="resolve_edit">Edit note</string>
+    <string name="resolve_title">Edit title</string>
+    <string name="error_title">Error</string>
+    <string name="error_message">Error loading note</string>
+    <string name="nothing_to_save">There is nothing to save</string>
+    <!-- 基本扩展：时间戳 & 搜索 -->
+    <string name="modified_prefix">修改于 %1$s</string>
+    <string name="hint_search_notes">搜索笔记…</string>
+    <string name="menu_search">Search</string>
+    <string name="sort_by_modified">按修改时间排序</string>
+    <string name="sort_by_title">按标题排序</string>
+    <string name="menu_sort">Sort</string>
+    <!-- 扩展：分类 -->
+    <string name="category_uncategorized">未分类</string>
+    <string name="category_work">工作</string>
+    <string name="category_personal">个人</string>
+    <string name="category_idea">灵感</string>
+    <string name="menu_category">分类</string>
+    <string name="menu_filter">按分类筛选</string>
+    <string name="filter_title">选择分类</string>
+    <string name="filter_all">全部</string>
+    <string name="filter_current">分类：%1$s</string>
+    <!-- 导出 / 云备份 / 恢复 -->
+    <string name="menu_export">导出笔记</string>
+    <string name="menu_backup">备份到云端</string>
+    <string name="menu_restore">从云端恢复</string>
+    <string name="export_chooser">导出笔记</string>
+    <string name="export_empty">没有可导出的笔记</string>
+    <string name="export_fail">导出失败</string>
+    <string name="backup_done">已备份 %1$d 条笔记到\n%2$s</string>
+    <string name="backup_empty">没有笔记可备份</string>
+    <string name="backup_fail">备份失败</string>
+    <string name="restore_title">从云端恢复</string>
+    <string name="restore_message">找到 %1$d 条备份笔记，是否追加到当前列表？</string>
+    <string name="restore_done">已恢复 %1$d 条笔记</string>
+    <string name="restore_missing">未找到云备份文件，请先执行“备份到云端”</string>
+    <string name="restore_fail">恢复失败：备份文件已损坏</string>
+    <string name="last_modified">修改于 %1$s</string>
+    <string name="notes_empty">暂无笔记\n点击右下角 + 或 NEW NOTE 新建</string>
+    <string name="fab_new_note">新建笔记</string>
+</resources>

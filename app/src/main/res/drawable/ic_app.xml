@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UI 美化：应用图标（笔记本） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF37474F"
+        android:pathData="M22,8h56a10,10 0 0 1 10,10v72a10,10 0 0 1 -10,10h-56a10,10 0 0 1 -10,-10v-72a10,10 0 0 1 10,-10z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M30,22h46v64h-46z" />
+    <path
+        android:fillColor="#FF26A69A"
+        android:pathData="M38,32h30v5h-30zM38,44h30v5h-30zM38,56h20v5h-20z" />
+    <path
+        android:fillColor="#FFFFB300"
+        android:pathData="M70,66a10,10 0 1 1 -0.01,0z" />
+</vector>
