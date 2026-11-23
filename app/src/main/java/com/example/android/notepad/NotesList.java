@@ -445,7 +445,7 @@ public class NotesList extends ListActivity {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.restore_title)
                 .setMessage(getString(R.string.restore_message, items.length()))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.button_restore, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int restored = 0;
@@ -471,7 +471,7 @@ public class NotesList extends ListActivity {
                                 getString(R.string.restore_done, restored), Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, null)
+                .setNegativeButton(R.string.button_cancel, null)
                 .show();
     }
 

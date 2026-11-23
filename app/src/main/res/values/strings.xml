@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">NotePad</string>
-    <string name="live_folder_name">Notes</string>
-    <string name="title_edit_title">Note title:</string>
-    <string name="title_create">New note</string>
+    <string name="app_name">记事本</string>
+    <string name="live_folder_name">笔记</string>
+    <string name="title_edit_title">笔记标题：</string>
+    <string name="title_create">新建笔记</string>
     <string name="title_edit">%1$s</string>
-    <string name="title_view">View note</string>
-    <string name="title_notes_list">Notes</string>
-    <string name="menu_add">New note</string>
-    <string name="menu_save">Save</string>
-    <string name="menu_delete">Delete</string>
-    <string name="menu_open">Open</string>
-    <string name="menu_revert">Revert changes</string>
-    <string name="menu_copy">Copy</string>
-    <string name="menu_paste">Paste</string>
-    <string name="button_ok">OK</string>
-    <string name="text_title">Title:</string>
-    <string name="resolve_edit">Edit note</string>
-    <string name="resolve_title">Edit title</string>
-    <string name="error_title">Error</string>
-    <string name="error_message">Error loading note</string>
-    <string name="nothing_to_save">There is nothing to save</string>
+    <string name="title_view">查看笔记</string>
+    <string name="title_notes_list">记事本</string>
+    <string name="menu_add">新建笔记</string>
+    <string name="menu_save">保存</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_open">打开</string>
+    <string name="menu_revert">撤销修改</string>
+    <string name="menu_copy">复制</string>
+    <string name="menu_paste">粘贴</string>
+    <string name="button_ok">确定</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_restore">恢复</string>
+    <string name="untitled_note">无标题</string>
+    <string name="text_title">标题：</string>
+    <string name="resolve_edit">编辑笔记</string>
+    <string name="resolve_title">编辑标题</string>
+    <string name="error_title">错误</string>
+    <string name="error_message">加载笔记失败</string>
+    <string name="nothing_to_save">没有可保存的内容</string>
     <!-- 基本扩展：时间戳 & 搜索 -->
     <string name="modified_prefix">修改于 %1$s</string>
     <string name="hint_search_notes">搜索笔记…</string>
-    <string name="menu_search">Search</string>
+    <string name="menu_search">搜索</string>
     <string name="sort_by_modified">按修改时间排序</string>
     <string name="sort_by_title">按标题排序</string>
-    <string name="menu_sort">Sort</string>
+    <string name="menu_sort">排序</string>
     <!-- 扩展：分类 -->
     <string name="category_uncategorized">未分类</string>
     <string name="category_work">工作</string>
@@ -54,6 +57,6 @@
     <string name="restore_missing">未找到云备份文件，请先执行“备份到云端”</string>
     <string name="restore_fail">恢复失败：备份文件已损坏</string>
     <string name="last_modified">修改于 %1$s</string>
-    <string name="notes_empty">暂无笔记\n点击右下角 + 或 NEW NOTE 新建</string>
+    <string name="notes_empty">暂无笔记，点击右下角 + 新建</string>
     <string name="fab_new_note">新建笔记</string>
 </resources>

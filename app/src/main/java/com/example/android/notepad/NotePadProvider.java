@@ -261,9 +261,8 @@ public class NotePadProvider extends ContentProvider
             values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, now);
         }
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE) == false) {
-            Resources r = Resources.getSystem();
             values.put(NotePad.Notes.COLUMN_NAME_TITLE,
-                    r.getString(android.R.string.untitled));
+                    getContext().getString(R.string.untitled_note));
         }
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");

@@ -29,7 +29,7 @@
 | --- | --- |
 | ![筛选](docs/screenshots/filter.png) | ![编辑器](docs/screenshots/editor.png) |
 
-默认列表按「修改时间」倒序（即上表第一张，Zebra plan 修改时间最新排在最前）；切换为按标题排序后，顺序变为 App idea → Shopping list → Team meeting → Zebra plan：
+默认列表按「修改时间」倒序（即上表第一张，顺序为 Team meeting → Zebra plan → App idea → Shopping list）；切换为按标题排序后，顺序变为 App idea → Shopping list → Team meeting → Zebra plan：
 
 ![按标题排序](docs/screenshots/sort_title.png)
 
