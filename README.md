@@ -15,7 +15,7 @@
 | 基本要求 1 | 笔记列表显示每条笔记的时间戳 | ✅ 每条显示"修改于 yyyy-MM-dd HH:mm" | 三、功能清单 · 七、核心实现 1 |
 | 基本要求 2 | 支持按标题、内容搜索笔记 | ✅ 顶部搜索框实时过滤，正文命中可见 | 三、功能清单 · 七、核心实现 2 |
 | 扩展要求 | 至少 2 项扩展功能 | ✅ 实现 4 项：分类、排序、UI 美化、导出与云备份恢复 | 三、功能清单 · 七、核心实现 3~7 |
-| 文档要求 | README 说明项目内容、功能与技术实现，图文并茂 | ✅ 本文档 12 章，含功能结构图、架构图、代码块、10 张运行截图、13 条测试记录 | 全篇 |
+| 文档要求 | README 说明项目内容、功能与技术实现，图文并茂 | ✅ 本文档 12 章，含架构图、代码块、9 张运行截图、13 条测试记录 | 全篇 |
 
 运行效果见 [二、界面预览](#二界面预览)，逐项验证见 [九、测试记录](#九测试记录)。
 
@@ -43,19 +43,7 @@
 
 ## 三、功能清单
 
-功能结构如下，共 2 项基本功能 + 4 项扩展功能：
-
-```mermaid
-graph TD
-    N["NotePad 记事本"] --> B["基本功能"]
-    N --> E["扩展功能"]
-    B --> B1["① 列表时间戳显示"]
-    B --> B2["② 标题 / 内容搜索"]
-    E --> E1["③ 笔记分类 + 分类筛选"]
-    E --> E2["④ 排序切换（时间 / 标题）"]
-    E --> E3["⑤ UI 美化（卡片、搜索框、FAB 等）"]
-    E --> E4["⑥ 导出笔记 + 云备份与恢复"]
-```
+本实验共实现 2 项基本功能 + 4 项扩展功能，逐项说明如下。
 
 ### 基本要求
 
@@ -152,6 +140,8 @@ graph LR
 
 ### 1. 时间戳显示
 
+`SimpleCursorAdapter` 默认只能把列值原样绑定到 `TextView`，毫秒时间戳会显示成一串数字，因此注册 `ViewBinder` 拦截 `tv_time`，把 `modified` 列格式化为"修改于 yyyy-MM-dd HH:mm"；`setViewValue` 返回 `true` 表示该视图已处理完毕，其他视图继续走默认绑定。
+
 ```java
 mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
     public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -182,14 +172,80 @@ Cursor c = getContentResolver().query(CONTENT_URI, PROJECTION, selection, args, 
 - 分类标签背景用 `(color & 0x00FFFFFF) | 0x22000000` 生成同色系淡色底
 - 菜单筛选把 `category = ?` 追加到搜索 selection 上，实现"分类 + 关键词"组合查询
 
+编辑器中的分类下拉框与保存逻辑：
+
+```java
+private static final String[] CATEGORIES = {
+        NotePad.Notes.CATEGORY_UNCATEGORIZED,
+        "工作", "个人", "灵感"
+};
+
+ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+        android.R.layout.simple_spinner_item, CATEGORIES);
+adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+mCategorySpinner.setAdapter(adapter);
+
+// 保存时写回数据库
+values.put(NotePad.Notes.COLUMN_NAME_CATEGORY,
+        (String) mCategorySpinner.getSelectedItem());
+getContentResolver().update(mUri, values, null, null);
+```
+
+列表侧按分类上色（标签 + 左侧色条由同一个颜色值驱动，保证视觉一致）：
+
+```java
+if (view.getId() == R.id.tv_category) {
+    int color = categoryColor(cursor.getString(columnIndex));
+    view.setBackgroundTintList(
+            ColorStateList.valueOf((color & 0x00FFFFFF) | 0x22000000));
+    ((TextView) view).setTextColor(color);
+    return false;
+}
+if (view.getId() == R.id.v_stripe) {
+    view.setBackgroundTintList(
+            ColorStateList.valueOf(categoryColor(cursor.getString(columnIndex))));
+    return true;
+}
+```
+
+筛选与搜索共用一套 selection 构造逻辑，两者可以任意组合：
+
+```java
+private String buildSelection() {
+    StringBuilder sb = new StringBuilder();
+    if (mSearchKeyword.length() > 0) {
+        sb.append("(title LIKE ? OR note LIKE ?)");
+    }
+    if (mFilterCategory != null) {
+        if (sb.length() > 0) sb.append(" AND ");
+        sb.append("category = ?");
+    }
+    return sb.length() == 0 ? null : sb.toString();
+}
+```
+
 ### 4. 排序
+
+两种排序规则以常量形式集中定义在契约类中，避免字符串散落：
 
 ```java
 public static final String DEFAULT_SORT_ORDER = "modified DESC";
 public static final String SORT_ORDER_BY_TITLE = "title COLLATE NOCASE ASC";
 ```
 
-菜单切换排序后重新查询并 `changeCursor`，无需重建 Activity。
+菜单点击后只切换标志位，再统一由 `getSortOrder()` 决定本次查询使用的排序：
+
+```java
+private boolean mSortByTitle = false;
+
+private String getSortOrder() {
+    return mSortByTitle
+            ? NotePad.Notes.SORT_ORDER_BY_TITLE
+            : NotePad.Notes.DEFAULT_SORT_ORDER;
+}
+```
+
+重新查询后 `changeCursor` 替换游标即可，无需重建 Activity，也不丢失搜索关键词和分类筛选条件。
 
 ### 5. UI 美化的关键点
 
@@ -198,11 +254,61 @@ public static final String SORT_ORDER_BY_TITLE = "title COLLATE NOCASE ASC";
 - 搜索框用 `selector` 区分 `state_focused`，聚焦时描边由浅灰变青色
 - 列表底部预留 92dp，避免悬浮按钮遮挡最后一条笔记
 
+卡片背景（用 `inset` 代替 margin）：
+
+```xml
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetBottom="4dp"
+    android:insetLeft="10dp"
+    android:insetRight="10dp"
+    android:insetTop="4dp">
+
+    <shape android:shape="rectangle">
+        <solid android:color="@color/card_bg" />
+        <corners android:radius="10dp" />
+        <stroke android:width="1dp" android:color="@color/card_stroke" />
+    </shape>
+</inset>
+```
+
+搜索框聚焦变色（`selector`）：
+
+```xml
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card_bg" />
+            <corners android:radius="22dp" />
+            <stroke android:width="1.5dp" android:color="@color/accent" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/card_bg" />
+            <corners android:radius="22dp" />
+            <stroke android:width="1dp" android:color="@color/card_stroke" />
+        </shape>
+    </item>
+</selector>
+```
+
 ### 6. 导出笔记
 
 1. 查询全部笔记，拼成带标题/分类/时间/正文的 txt
 2. 写入 `cache/exports/notepad_export_<时间戳>.txt`
 3. `FileProvider.getUriForFile()` 生成 `content://` URI，通过 `ACTION_SEND` 调起系统分享面板（微信、邮件、网盘等）
+
+```java
+File file = new File(exportDir, "notepad_export_" + stamp + ".txt");
+// ... 写入 txt 内容 ...
+
+Uri uri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, file);
+Intent send = new Intent(Intent.ACTION_SEND);
+send.setType("text/plain");
+send.putExtra(Intent.EXTRA_STREAM, uri);
+send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+startActivity(Intent.createChooser(send, getString(R.string.export_chooser)));
+```
 
 `AndroidManifest.xml` 中注册：
 
@@ -223,6 +329,47 @@ public static final String SORT_ORDER_BY_TITLE = "title COLLATE NOCASE ASC";
 - 备份内容：`[{title, note, created, modified, category}, ...]`
 - 恢复流程：读取 JSON → `AlertDialog` 提示"找到 N 条备份笔记，是否追加到当前列表？" → 逐条 `insert` → `refreshList()` 并 Toast 恢复条数
 - 未备份时提示"未找到云备份文件，请先执行'备份到云端'"，JSON 损坏时提示"备份文件已损坏"
+
+备份文件结构（每条形如）：
+
+```json
+[
+  {
+    "title": "Team meeting",
+    "note": "每周一 10:00 例会，准备周报",
+    "created": 1763253000000,
+    "modified": 1763253180000,
+    "category": "工作"
+  }
+]
+```
+
+备份写入与恢复插入：
+
+```java
+// 备份：全部笔记 -> JSON 数组 -> 应用外部目录
+JSONArray array = new JSONArray();
+while (cursor.moveToNext()) {
+    JSONObject item = new JSONObject();
+    item.put("title", cursor.getString(0));
+    item.put("note", cursor.getString(1));
+    item.put("created", cursor.getLong(2));
+    item.put("modified", cursor.getLong(3));
+    item.put("category", cursor.getString(4));
+    array.put(item);
+}
+writer.write(array.toString());
+
+// 恢复：读取 JSON -> 确认框 -> 逐条插入
+ContentValues values = new ContentValues();
+values.put(NotePad.Notes.COLUMN_NAME_TITLE, item.optString("title", ""));
+values.put(NotePad.Notes.COLUMN_NAME_NOTE, item.optString("note", ""));
+values.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE, item.optLong("created", now));
+values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, item.optLong("modified", now));
+values.put(NotePad.Notes.COLUMN_NAME_CATEGORY,
+        item.optString("category", NotePad.Notes.CATEGORY_UNCATEGORIZED));
+getContentResolver().insert(NotePad.Notes.CONTENT_URI, values);
+```
 
 > 说明：此处的"云端"指应用的外部备份目录（`/storage/emulated/0/Android/data/com.example.android.notepad/files/cloud/`），离线即可演示；如需接入真实云服务，只需把 JSON 的上传/下载替换为网盘或自建接口，其余逻辑不变。
 
