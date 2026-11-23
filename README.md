@@ -15,7 +15,7 @@
 | 基本要求 1 | 笔记列表显示每条笔记的时间戳 | ✅ 每条显示"修改于 yyyy-MM-dd HH:mm" | 三、功能清单 · 七、核心实现 1 |
 | 基本要求 2 | 支持按标题、内容搜索笔记 | ✅ 顶部搜索框实时过滤，正文命中可见 | 三、功能清单 · 七、核心实现 2 |
 | 扩展要求 | 至少 2 项扩展功能 | ✅ 实现 4 项：分类、排序、UI 美化、导出与云备份恢复 | 三、功能清单 · 七、核心实现 3~7 |
-| 文档要求 | README 说明项目内容、功能与技术实现，图文并茂 | ✅ 本文档 12 章，含架构图、代码块、9 张运行截图、13 条测试记录 | 全篇 |
+| 文档要求 | README 说明项目内容、功能与技术实现，图文并茂 | ✅ 本文档 12 章，含 7 段核心代码、9 张运行截图、13 条测试记录 | 全篇 |
 
 运行效果见 [二、界面预览](#二界面预览)，逐项验证见 [九、测试记录](#九测试记录)。
 
@@ -125,18 +125,7 @@ ContentProvider 提供 `content://com.google.provider.NotePad/notes` 与 `/notes
 
 ## 七、核心实现说明
 
-整体结构为"界面层 → ContentResolver → ContentProvider → SQLite"，导出与备份走独立的文件通道，互不影响：
-
-```mermaid
-graph LR
-    UI["界面层<br/>NotesList / NoteEditor<br/>（搜索、筛选、排序）"] --> CR["ContentResolver"]
-    CR --> CP["NotePadProvider<br/>（URI 匹配 / 增删改查）"]
-    CP --> DB[("SQLite<br/>note_pad.db · notes 表")]
-    CP -.->|notifyChange| UI
-    UI --> FP["FileProvider"]
-    FP --> SH["系统分享面板<br/>（微信 / 邮件 / 网盘）"]
-    UI --> CL["cloud/notes_backup.json<br/>（云端备份目录）"]
-```
+整体结构为"界面层 → ContentResolver → ContentProvider → SQLite"，界面层负责搜索、筛选、排序并把 SQL 交给 Provider 执行；导出与备份不经过数据库，直接走文件通道，两条链路互不影响。下面按功能逐项说明实现方式。
 
 ### 1. 时间戳显示
 
