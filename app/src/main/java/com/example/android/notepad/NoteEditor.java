@@ -6,11 +6,11 @@
  */
 package com.example.android.notepad;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -18,11 +18,9 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -34,7 +32,6 @@ import java.util.Locale;
 
 @SuppressWarnings("deprecation")
 public class NoteEditor extends Activity {
-    private static final String TAG = "NoteEditor";
 
     private static final String[] PROJECTION = new String[] {
             NotePad.Notes._ID,
@@ -76,17 +73,21 @@ public class NoteEditor extends Activity {
             values.put(NotePad.Notes.COLUMN_NAME_TITLE,
                     getString(R.string.title_create));
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
-            mUri = getContentResolver().insert(getIntent().getData(), values);
+            Uri target = intent.getData();
+            if (target == null) {
+                target = NotePad.Notes.CONTENT_URI;
+            }
+            mUri = getContentResolver().insert(target, values);
         } else {
             setTitle(R.string.title_view);
             mUri = intent.getData();
         }
 
         setContentView(R.layout.note_editor);
-        mText = (EditText) findViewById(R.id.note);
-        mCategorySpinner = (Spinner) findViewById(R.id.spinner_category);
+        mText = findViewById(R.id.note);
+        mCategorySpinner = findViewById(R.id.spinner_category);
         // 设置 Spinner 选项
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, CATEGORIES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCategorySpinner.setAdapter(adapter);
@@ -115,7 +116,7 @@ public class NoteEditor extends Activity {
             }
 
             // UI 美化：右上角显示最后修改时间
-            TextView tvModified = (TextView) findViewById(R.id.tv_modified);
+            TextView tvModified = findViewById(R.id.tv_modified);
             if (tvModified != null) {
                 long modified = mCursor.getLong(COLUMN_INDEX_MODIFIED);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
@@ -188,6 +189,7 @@ public class NoteEditor extends Activity {
         }
     }
 
+    @SuppressLint("AppCompatCustomView")
     public static class LinedEditText extends EditText {
         private Rect mRect;
         private Paint mPaint;
