@@ -4,7 +4,22 @@
 
 > 姓名：_黄立涛_______　学号：_121052024112_______　班级：__软工3班______
 
-## 一、界面预览
+## 一、实验要求与完成情况
+
+**实验内容**：以 Android 官方 NotePad 示例为原型，独立完成一个可运行的记事本 App，界面与操作流程保持与示例一致，并在其基础上完成两项基本要求和至少两项扩展功能，最终提交源码与 README 文档。
+
+**完成情况总览**：
+
+| 类型 | 要求 | 完成情况 | 对应位置 |
+| --- | --- | --- | --- |
+| 基本要求 1 | 笔记列表显示每条笔记的时间戳 | ✅ 每条显示"修改于 yyyy-MM-dd HH:mm" | 三、功能清单 · 七、核心实现 1 |
+| 基本要求 2 | 支持按标题、内容搜索笔记 | ✅ 顶部搜索框实时过滤，正文命中可见 | 三、功能清单 · 七、核心实现 2 |
+| 扩展要求 | 至少 2 项扩展功能 | ✅ 实现 4 项：分类、排序、UI 美化、导出与云备份恢复 | 三、功能清单 · 七、核心实现 3~7 |
+| 文档要求 | README 说明项目内容、功能与技术实现，图文并茂 | ✅ 本文档 12 章，含功能结构图、架构图、代码块、10 张运行截图、13 条测试记录 | 全篇 |
+
+运行效果见 [二、界面预览](#二界面预览)，逐项验证见 [九、测试记录](#九测试记录)。
+
+## 二、界面预览
 
 | 笔记列表（时间戳 + 分类标签） | 标题/内容搜索 |
 | --- | --- |
@@ -14,9 +29,9 @@
 | --- | --- |
 | ![筛选](docs/screenshots/filter.png) | ![编辑器](docs/screenshots/editor.png) |
 
-| 排序：按修改时间 | 排序：按标题 |
-| --- | --- |
-| ![按时间排序](docs/screenshots/sort_time.png) | ![按标题排序](docs/screenshots/sort_title.png) |
+默认列表按「修改时间」倒序（即上表第一张，Zebra plan 修改时间最新排在最前）；切换为按标题排序后，顺序变为 App idea → Shopping list → Team meeting → Zebra plan：
+
+![按标题排序](docs/screenshots/sort_title.png)
 
 | 导出笔记（系统分享面板） | 云备份 / 恢复 |
 | --- | --- |
@@ -26,7 +41,21 @@
 
 ![空状态](docs/screenshots/empty.png)
 
-## 二、功能清单
+## 三、功能清单
+
+功能结构如下，共 2 项基本功能 + 4 项扩展功能：
+
+```mermaid
+graph TD
+    N["NotePad 记事本"] --> B["基本功能"]
+    N --> E["扩展功能"]
+    B --> B1["① 列表时间戳显示"]
+    B --> B2["② 标题 / 内容搜索"]
+    E --> E1["③ 笔记分类 + 分类筛选"]
+    E --> E2["④ 排序切换（时间 / 标题）"]
+    E --> E3["⑤ UI 美化（卡片、搜索框、FAB 等）"]
+    E --> E4["⑥ 导出笔记 + 云备份与恢复"]
+```
 
 ### 基本要求
 
@@ -51,7 +80,7 @@
 - 搜索：顶部搜索框输入即过滤，清空恢复全部
 - 排序 / 分类筛选 / 导出 / 备份 / 恢复：ActionBar 右上角 `⋮` 菜单
 
-## 三、技术栈与开发环境
+## 四、技术栈与开发环境
 
 | 项目 | 版本 / 说明 |
 | --- | --- |
@@ -63,7 +92,7 @@
 | 关键配置 | `android.nonFinalResIds=false`（AGP 8 默认 R 字段非 final，导致 `switch-case` 使用 `R.id` 编译失败） |
 | 测试设备 | Pixel 5 模拟器，Android 系统镜像 API 37，1080×2340 |
 
-## 四、项目结构
+## 五、项目结构
 
 ```
 NotePadOfficial/
@@ -89,7 +118,7 @@ NotePadOfficial/
 └── README.md
 ```
 
-## 五、数据库设计
+## 六、数据库设计
 
 数据库 `note_pad.db`，当前版本 `DATABASE_VERSION = 3`，表 `notes`：
 
@@ -106,7 +135,20 @@ NotePadOfficial/
 
 ContentProvider 提供 `content://com.google.provider.NotePad/notes` 与 `/notes/#` 两种 URI，支持列表查询、单条查询、插入、更新、删除，并通过 `ContentResolver.notifyChange` 让列表自动刷新。
 
-## 六、核心实现说明
+## 七、核心实现说明
+
+整体结构为"界面层 → ContentResolver → ContentProvider → SQLite"，导出与备份走独立的文件通道，互不影响：
+
+```mermaid
+graph LR
+    UI["界面层<br/>NotesList / NoteEditor<br/>（搜索、筛选、排序）"] --> CR["ContentResolver"]
+    CR --> CP["NotePadProvider<br/>（URI 匹配 / 增删改查）"]
+    CP --> DB[("SQLite<br/>note_pad.db · notes 表")]
+    CP -.->|notifyChange| UI
+    UI --> FP["FileProvider"]
+    FP --> SH["系统分享面板<br/>（微信 / 邮件 / 网盘）"]
+    UI --> CL["cloud/notes_backup.json<br/>（云端备份目录）"]
+```
 
 ### 1. 时间戳显示
 
@@ -184,7 +226,7 @@ public static final String SORT_ORDER_BY_TITLE = "title COLLATE NOCASE ASC";
 
 > 说明：此处的"云端"指应用的外部备份目录（`/storage/emulated/0/Android/data/com.example.android.notepad/files/cloud/`），离线即可演示；如需接入真实云服务，只需把 JSON 的上传/下载替换为网盘或自建接口，其余逻辑不变。
 
-## 七、构建与运行
+## 八、构建与运行
 
 ```bash
 # 1. 构建 Debug APK
@@ -199,7 +241,7 @@ adb shell am start -n com.example.android.notepad/.NotesList
 
 APK 输出路径：`app/build/outputs/apk/debug/app-debug.apk`
 
-## 八、测试记录
+## 九、测试记录
 
 测试环境：Pixel 5 模拟器（1080×2340），Android API 37。
 
@@ -219,7 +261,7 @@ APK 输出路径：`app/build/outputs/apk/debug/app-debug.apk`
 | 12 | 云恢复 | 清空数据库 → 从云端恢复 → 确定 | 确认框显示 N 条，恢复后列表重新出现全部笔记 | 通过 |
 | 13 | 空状态 | 删除全部笔记 | 显示"暂无笔记，点击右下角 + 或 NEW NOTE 新建" | 通过 |
 
-## 九、开发中遇到的问题与解决
+## 十、开发中遇到的问题与解决
 
 | 问题 | 原因 | 解决方案 |
 | --- | --- | --- |
@@ -229,7 +271,7 @@ APK 输出路径：`app/build/outputs/apk/debug/app-debug.apk`
 | 分享 `file://` 路径报 `FileUriExposedException` | Android 7.0+ 禁止跨应用暴露 file URI | 注册 `FileProvider`，用 `content://` URI 并授予读权限 |
 | 备份 Toast 路径显示不全 | Toast 最大宽度有限，长路径自动截断 | 保留 Toast 提示，完整路径可通过 `adb` 或文件管理器查看 |
 
-## 十、可扩展方向
+## 十一、可扩展方向
 
 - 接入真实云端（如对象存储 / 自建 REST 接口），支持多设备同步与冲突合并
 - 笔记置顶、收藏、标签多选
@@ -237,7 +279,7 @@ APK 输出路径：`app/build/outputs/apk/debug/app-debug.apk`
 - 数据库加密（SQLCipher）与导出 PDF
 - 深色模式（`values-night`）适配
 
-## 十一、参考
+## 十二、参考
 
 - Android 官方 NotePad 示例（`platform/development/samples/NotePad`）
 - [Android Sample--NotePad解析](https://blog.csdn.net/llfjfz/article/details/67638499)
